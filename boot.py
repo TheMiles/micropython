@@ -8,8 +8,8 @@ import toollib
 import network
 import time
 import machine
-from mqtt_test import TestMQTT
-from button import Button
+from umqtt.robust import MQTTClient
+from button import MQTTButton
 
 
 c = toollib.readConfig('config')
@@ -24,6 +24,9 @@ while station.isconnected() == False:
     time.sleep(1)
 print('Connection successful')
 
+client = MQTTClient("testClient", c['MQTT_HOST'], user=c['MQTT_USER'], password=c['MQTT_PWD'])
+client.connect()
+
 #m = TestMQTT('me', c['MQTT_HOST'], user=c['MQTT_USER'], password=c['MQTT_PWD'])
 
 led = machine.Pin(12, machine.Pin.OUT)
@@ -34,5 +37,5 @@ def cb_switchLed(p):
     led.value(not led.value())
 
 
-button = Button(14, cb_switchLed, trigger=machine.Pin.IRQ_RISING | machine.Pin.IRQ_FALLING)
-button.startListen()
+button = MQTTButton(14, client, "buttons/bell/one")
+

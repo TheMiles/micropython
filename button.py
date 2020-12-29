@@ -1,5 +1,6 @@
 import time
 import machine
+from umqtt.robust import MQTTClient
 
 class ElapsedTime:
 
@@ -40,7 +41,28 @@ class Button:
         self.pin.irq(trigger=self.trigger, handler=self.debounceHandler)
 
 
-
     def stopListen(self):
 
         self.pin.irq(trigger=self.trigger, handler=None)
+
+
+
+class MQTTButton(Button):
+
+    def __init__(self, pin, client, topic):
+
+        self.state  = 0
+        self.client = client
+        self.topic  = topic
+        super().__init__(pin, self.toggleButton, trigger=machine.Pin.IRQ_RISING | machine.Pin.IRQ_FALLING)
+        self.startListen()
+
+    def toggleButton(self, p):
+
+        self.state = not self.state
+        self.publishState()
+
+
+    def publishState(self):
+
+        self.client.publish(self.topic, str(self.state))
