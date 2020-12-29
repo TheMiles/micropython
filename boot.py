@@ -5,9 +5,12 @@
 #webrepl.start()
 
 import toollib
-from mqtt_test import TestMQTT
 import network
 import time
+import machine
+from mqtt_test import TestMQTT
+from button import Button
+
 
 c = toollib.readConfig('config')
 
@@ -21,5 +24,15 @@ while station.isconnected() == False:
     time.sleep(1)
 print('Connection successful')
 
-m = TestMQTT('me', c['MQTT_HOST'], user=c['MQTT_USER'], password=c['MQTT_PWD'])
+#m = TestMQTT('me', c['MQTT_HOST'], user=c['MQTT_USER'], password=c['MQTT_PWD'])
 
+led = machine.Pin(12, machine.Pin.OUT)
+
+def cb_switchLed(p):
+    global led
+
+    led.value(not led.value())
+
+
+button = Button(14, cb_switchLed, trigger=machine.Pin.IRQ_RISING | machine.Pin.IRQ_FALLING)
+button.startListen()
