@@ -11,6 +11,8 @@ import machine
 from umqtt.robust import MQTTClient
 from button import MQTTButton
 
+topic = "buttons/bell/one"
+
 
 c = toollib.readConfig('config')
 
@@ -27,15 +29,23 @@ print('Connection successful')
 client = MQTTClient("testClient", c['MQTT_HOST'], user=c['MQTT_USER'], password=c['MQTT_PWD'])
 client.connect()
 
-#m = TestMQTT('me', c['MQTT_HOST'], user=c['MQTT_USER'], password=c['MQTT_PWD'])
-
 led = machine.Pin(12, machine.Pin.OUT)
 
-def cb_switchLed(p):
+def cb_subscribedTopic(t,m):
     global led
 
-    led.value(not led.value())
+    print("Topic",t,"changed to",m)
+
+    led.value(1 if m==b'True' else 0)
 
 
-button = MQTTButton(14, client, "buttons/bell/one")
+button = MQTTButton(14, client, topic)
 
+client.set_callback(cb_subscribedTopic)
+client.subscribe(topic)
+
+try:
+    while 1:
+        client.wait_msg()
+finally:
+    client.disconnect()
