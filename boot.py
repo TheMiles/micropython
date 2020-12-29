@@ -4,3 +4,7 @@
 #import webrepl
 #webrepl.start()
 
+import toollib
+
+c = toollib.readConfig('config')
+
