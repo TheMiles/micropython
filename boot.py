@@ -5,6 +5,7 @@
 #webrepl.start()
 
 import toollib
+from mqtt_test import TestMQTT
 import network
 import time
 
@@ -19,4 +20,6 @@ while station.isconnected() == False:
     print('Trying to connect to',c['WLAN_SSID'])
     time.sleep(1)
 print('Connection successful')
+
+m = TestMQTT('me', c['MQTT_HOST'], user=c['MQTT_USER'], password=c['MQTT_PWD'])
 
