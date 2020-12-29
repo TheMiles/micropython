@@ -31,12 +31,25 @@ client.connect()
 
 led = machine.Pin(12, machine.Pin.OUT)
 
+def blinkLED(led):
+    led.value(1)
+    time.sleep(0.5)
+    led.value(0)
+    time.sleep(0.2)
+    led.value(1)
+    time.sleep(0.5)
+    led.value(0)
+    time.sleep(0.2)
+    led.value(1)
+    time.sleep(0.5)
+    led.value(0)
+
+
 def cb_subscribedTopic(t,m):
     global led
 
-    print("Topic",t,"changed to",m)
-
-    led.value(1 if m==b'True' else 0)
+    if m==b'True':
+        blinkLED(led)
 
 
 button = MQTTButton(14, client, topic)
