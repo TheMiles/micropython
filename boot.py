@@ -7,11 +7,15 @@
 import toollib
 import network
 import time
+import ubinascii
 import machine
 from umqtt.robust import MQTTClient
 from button import MQTTButton
 
 topic = "buttons/bell/one"
+
+client_id = ubinascii.hexlify(machine.unique_id())
+
 
 
 c = toollib.readConfig('config')
@@ -25,9 +29,6 @@ while station.isconnected() == False:
     print('Trying to connect to',c['WLAN_SSID'])
     time.sleep(1)
 print('Connection successful')
-
-client = MQTTClient("testClient", c['MQTT_HOST'], user=c['MQTT_USER'], password=c['MQTT_PWD'])
-client.connect()
 
 led = machine.Pin(12, machine.Pin.OUT)
 
@@ -44,21 +45,37 @@ def blinkLED(led):
     time.sleep(0.5)
     led.value(0)
 
+def connect_mqtt():
+    global client_id, c
+    client = MQTTClient(client_id, c['MQTT_HOST'], user=c['MQTT_USER'], password=c['MQTT_PWD'])
+    client.connect()
+    print('Connected to {} MQTT broker'.format(c['MQTT_HOST']))
+    return client
+
+def restart_and_reconnect():
+  print('Failed to connect to MQTT broker. Reconnecting...')
+  time.sleep(10)
+  machine.reset()
+
+
+
+try:
+    client = connect_mqtt()
+except OSError as e:
+    restart_and_reconnect()
 
 def cb_subscribedTopic(t,m):
     global led
-
     if m==b'True':
         blinkLED(led)
 
 
-button = MQTTButton(14, client, topic)
-
 client.set_callback(cb_subscribedTopic)
 client.subscribe(topic)
 
-try:
-    while 1:
+while True:
+    try:
         client.wait_msg()
-finally:
-    client.disconnect()
+    except OSError as e:
+        restart_and_reconnect()
+
