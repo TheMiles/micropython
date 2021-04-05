@@ -64,6 +64,8 @@ while True:
     time.sleep(1)
     pixels.fill(pixel.BLUE)
     time.sleep(1)
+    pixels.fill(pixel.WHITE)
+    time.sleep(1)
 
     pixels.color_chase(pixel.RED)
     pixels.color_chase(pixel.YELLOW)
@@ -72,4 +74,4 @@ while True:
     pixels.color_chase(pixel.BLUE)
     pixels.color_chase(pixel.PURPLE)
 
-    pixels.rainbow_cycle()
+    pixels.rainbow_cycle(cycles=2)

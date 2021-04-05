@@ -2,13 +2,14 @@ import neopixel
 import machine
 import time
 
-RED    = (255,   0,   0)
-YELLOW = (255, 150,   0)
-GREEN  = (  0, 255,   0)
-CYAN   = (  0, 255, 255)
-BLUE   = (  0,   0, 255)
-PURPLE = (180,   0, 255)
-BLACK  = (  0,   0,   0)
+RED    = (255,   0,   0,   0)
+YELLOW = (255, 150,   0,   0)
+GREEN  = (  0, 255,   0,   0)
+CYAN   = (  0, 255, 255,   0)
+BLUE   = (  0,   0, 255,   0)
+PURPLE = (180,   0, 255,   0)
+BLACK  = (  0,   0,   0,   0)
+WHITE  = (  0,   0,   0, 255)
 
 
 
@@ -20,7 +21,7 @@ class Pixels(object):
         self.pin        = machine.Pin(5, machine.Pin.OUT)
         self.num_pixels = num_pixels
         self.pixels     = [BLACK]*self.num_pixels
-        self.pixels_out = neopixel.NeoPixel(self.pin, self.num_pixels)
+        self.pixels_out = neopixel.NeoPixel(self.pin, self.num_pixels, bpp=4)
         self.brightness = 5
 
 
@@ -66,14 +67,14 @@ class Pixels(object):
         # Input a value 0 to 255 to get a color value.
         # The colours are a transition r - g - b - back to r.
         if pos < 0 or pos > 255:
-            return (0, 0, 0)
+            return (0, 0, 0, 0)
         if pos < 85:
-            return (255 - pos * 3, pos * 3, 0)
+            return (255 - pos * 3, pos * 3, 0, 0)
         if pos < 170:
             pos -= 85
-            return (0, 255 - pos * 3, pos * 3)
+            return (0, 255 - pos * 3, pos * 3, 0)
         pos -= 170
-        return (pos * 3, 0, 255 - pos * 3)
+        return (pos * 3, 0, 255 - pos * 3, 0)
 
 
 
