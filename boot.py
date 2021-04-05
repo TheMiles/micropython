@@ -20,15 +20,17 @@ client_id = ubinascii.hexlify(machine.unique_id())
 
 c = toollib.readConfig('config')
 
-station = network.WLAN(network.STA_IF)
 
-station.active(True)
-station.connect(c['WLAN_SSID'], c['WLAN_PWD'])
+def connect_wifi(c):
 
-while station.isconnected() == False:
     print('Trying to connect to',c['WLAN_SSID'])
-    time.sleep(1)
-print('Connection successful')
+    station = network.WLAN(network.STA_IF)
+    station.active(True)
+    station.connect(c['WLAN_SSID'], c['WLAN_PWD'])
+
+    while not station.isconnected() :
+        pass
+    print('Connection successful')
 
 led = machine.Pin(12, machine.Pin.OUT)
 
@@ -58,6 +60,7 @@ def restart_and_reconnect():
   machine.reset()
 
 
+connect_wifi(c)
 
 try:
     client = connect_mqtt()
